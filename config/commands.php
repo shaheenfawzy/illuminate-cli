@@ -21,7 +21,7 @@ return [
     |
     */
 
-    'default' => SummaryCommand::class,
+    'default' => App\Commands\IlluminateCommand::class,
 
     /*
     |--------------------------------------------------------------------------
