@@ -8,13 +8,9 @@ use Illuminate\Support\Facades\Http;
 
 class ApiClient
 {
-    private string $baseUrl;
+    private string $baseUrl = 'https://illuminate.bitech.dev/api';
 
-    public function __construct(
-        private readonly string $token,
-    ) {
-        $this->baseUrl = 'https://illuminate.bitech.dev/api';
-    }
+    public function __construct(private readonly string $token) {}
 
     /** @return array<string, mixed> */
     public function getChallenge(): array
@@ -24,6 +20,7 @@ class ApiClient
 
         $response->throw();
 
+        /** @var array<string, mixed> */
         return $response->json();
     }
 
@@ -37,6 +34,7 @@ class ApiClient
 
         $response->throw();
 
+        /** @var array<string, mixed> */
         return $response->json();
     }
 
@@ -48,6 +46,7 @@ class ApiClient
 
         $response->throw();
 
+        /** @var array<string, mixed> */
         return $response->json();
     }
 }

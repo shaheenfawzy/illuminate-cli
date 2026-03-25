@@ -13,8 +13,8 @@ class ConfigStore
     public function __construct()
     {
         $home = $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'] ?? '';
-        $this->configDir = $home . '/.illuminate';
-        $this->configFile = $this->configDir . '/config.json';
+        $this->configDir = (is_string($home) ? $home : '').'/.illuminate';
+        $this->configFile = $this->configDir.'/config.json';
     }
 
     public function getToken(): ?string

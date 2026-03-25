@@ -7,6 +7,7 @@ namespace App\Commands;
 use App\Services\ApiClient;
 use App\Services\ConfigStore;
 use App\Support\DatabaseConnector;
+use Exception;
 use LaravelZero\Framework\Commands\Command;
 
 class IlluminateCommand extends Command
@@ -46,22 +47,23 @@ class IlluminateCommand extends Command
 
         try {
             $challenge = $client->getChallenge();
-        } catch (\Exception) {
-            $connector = new DatabaseConnector();
+        } catch (Exception) {
+            $connector = new DatabaseConnector;
 
             return $connector->initialize($this);
         }
 
         // If still at registered or stage_0, show the break
         if (in_array($challenge['stage'] ?? '', ['registered', 'stage_0'], true)) {
-            $connector = new DatabaseConnector();
+            $connector = new DatabaseConnector;
 
             return $connector->initialize($this);
         }
 
         // Show current stage instructions
         $this->newLine();
-        $this->line($challenge['instructions'] ?? 'No instructions available.');
+        $instructions = $challenge['instructions'] ?? 'No instructions available.';
+        $this->line(is_string($instructions) ? $instructions : 'No instructions available.');
         $this->newLine();
 
         // Download SSH key for Stage 2+
@@ -75,7 +77,7 @@ class IlluminateCommand extends Command
     private function downloadSshKey(ApiClient $client): void
     {
         $configStore = app(ConfigStore::class);
-        $keyPath = $configStore->configDir() . '/key';
+        $keyPath = $configStore->configDir().'/key';
 
         if (file_exists($keyPath)) {
             return;
@@ -89,7 +91,7 @@ class IlluminateCommand extends Command
                 chmod($keyPath, 0600);
                 $this->info("SSH key saved to {$keyPath}");
             }
-        } catch (\Exception) {
+        } catch (Exception) {
             // Silently fail — they can retry
         }
     }
