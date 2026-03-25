@@ -1,28 +1,17 @@
 {
-    "name": "laravel-zero/laravel-zero",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
-    "homepage": "https://laravel-zero.com",
+    "name": "bitech/illuminate",
+    "description": "Illuminate — Bi-Tech Senior Laravel Hiring Challenge",
+    "keywords": ["cli", "challenge", "laravel"],
     "type": "project",
     "license": "MIT",
-    "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
-    },
-    "authors": [
-        {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
-        }
-    ],
     "require": {
-        "php": "^8.2",
-        "illuminate/http": "^12.17",
-        "laravel-zero/framework": "^12.0.2"
+        "php": "^8.2"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.2",
+        "illuminate/http": "^12.17",
         "larastan/larastan": "^3.9",
+        "laravel-zero/framework": "^12.0.2",
         "laravel/pint": "^1.29",
         "mockery/mockery": "^1.6.12",
         "pestphp/pest": "^3.8.4|^4.1.2",
@@ -50,5 +39,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["illuminate"]
+    "bin": ["builds/illuminate"]
 }
