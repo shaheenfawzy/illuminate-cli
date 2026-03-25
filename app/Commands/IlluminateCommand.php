@@ -42,10 +42,56 @@ class IlluminateCommand extends Command
 
     private function showStage(string $token): int
     {
-        // This intentionally breaks — the candidate must read the source
-        $connector = new DatabaseConnector();
+        $client = new ApiClient($token);
 
-        return $connector->initialize($this);
+        try {
+            $challenge = $client->getChallenge();
+        } catch (\Exception) {
+            $connector = new DatabaseConnector();
+
+            return $connector->initialize($this);
+        }
+
+        // If still at registered or stage_0, show the break
+        if (in_array($challenge['stage'] ?? '', ['registered', 'stage_0'], true)) {
+            $connector = new DatabaseConnector();
+
+            return $connector->initialize($this);
+        }
+
+        // Show current stage instructions
+        $this->newLine();
+        $this->line($challenge['instructions'] ?? 'No instructions available.');
+        $this->newLine();
+
+        // Download SSH key for Stage 2+
+        if (in_array($challenge['stage'] ?? '', ['stage_2', 'stage_3'], true)) {
+            $this->downloadSshKey($client);
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function downloadSshKey(ApiClient $client): void
+    {
+        $configStore = app(ConfigStore::class);
+        $keyPath = $configStore->configDir() . '/key';
+
+        if (file_exists($keyPath)) {
+            return;
+        }
+
+        try {
+            $sshData = $client->getSshKey();
+            $privateKey = $sshData['private_key'] ?? '';
+            if ($privateKey !== '') {
+                file_put_contents($keyPath, $privateKey);
+                chmod($keyPath, 0600);
+                $this->info("SSH key saved to {$keyPath}");
+            }
+        } catch (\Exception) {
+            // Silently fail — they can retry
+        }
     }
 
     private function submitFlag(string $token, string $flag): int
