@@ -22,14 +22,14 @@ class IlluminateCommand extends Command
     {
         if ($token = $this->option('token')) {
             $config->setToken($token);
-            $this->info('Token configured. Run `illuminate` to begin.');
+            $this->components->info('Token configured. Run `illuminate` to begin.');
 
             return self::SUCCESS;
         }
 
         $token = $config->getToken();
         if (! $token) {
-            $this->error('No token configured. Run: illuminate --token=<your-token>');
+            $this->components->error('No token configured. Run: illuminate --token=<your-token>');
 
             return self::FAILURE;
         }
@@ -49,18 +49,30 @@ class IlluminateCommand extends Command
             $challenge = $client->getChallenge();
         } catch (Exception) {
             $connector = new DatabaseConnector;
+            if (! $connector->verify()) {
+                $this->components->error('Something Went Wrong: Database connection failed — ensure your .env is configured correctly.');
 
-            return $connector->initialize($this);
+                return self::FAILURE;
+            }
+
+            return self::SUCCESS;
         }
 
         // If still at registered or stage_0, show the break
         if (in_array($challenge['stage'] ?? '', ['registered', 'stage_0'], true)) {
             $connector = new DatabaseConnector;
+            if (! $connector->verify()) {
+                $this->components->error('Something Went Wrong: Database connection failed — ensure your .env is configured correctly.');
 
-            return $connector->initialize($this);
+                return self::FAILURE;
+            }
+
+            return self::SUCCESS;
         }
 
         // Show current stage instructions
+        $stage = is_string($challenge['stage'] ?? null) ? $challenge['stage'] : 'unknown';
+        $this->components->info("Stage: {$stage}");
         $this->newLine();
         $instructions = $challenge['instructions'] ?? 'No instructions available.';
         $this->line(is_string($instructions) ? $instructions : 'No instructions available.');
@@ -84,13 +96,17 @@ class IlluminateCommand extends Command
         }
 
         try {
-            $sshData = $client->getSshKey();
-            $privateKey = $sshData['private_key'] ?? '';
-            if ($privateKey !== '') {
+            $this->components->task('Downloading SSH key', function () use ($client, $keyPath): bool {
+                $sshData = $client->getSshKey();
+                $privateKey = $sshData['private_key'] ?? '';
+                if ($privateKey === '') {
+                    return false;
+                }
                 file_put_contents($keyPath, $privateKey);
                 chmod($keyPath, 0600);
-                $this->info("SSH key saved to {$keyPath}");
-            }
+
+                return true;
+            });
         } catch (Exception) {
             // Silently fail — they can retry
         }
@@ -102,12 +118,12 @@ class IlluminateCommand extends Command
         $result = $client->submitAnswer($flag);
 
         if (($result['status'] ?? '') === 'correct') {
-            $this->info('Correct.');
+            $this->components->info('Correct.');
 
             return self::SUCCESS;
         }
 
-        $this->error('Incorrect.');
+        $this->components->error('Incorrect.');
 
         return self::FAILURE;
     }

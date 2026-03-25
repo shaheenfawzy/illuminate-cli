@@ -18,7 +18,7 @@ class SubmitCommand extends Command
     {
         $token = $config->getToken();
         if (! $token) {
-            $this->error('No token configured. Run: illuminate --token=<your-token>');
+            $this->components->error('No token configured. Run: illuminate --token=<your-token>');
 
             return self::FAILURE;
         }
@@ -27,12 +27,12 @@ class SubmitCommand extends Command
         $result = $client->submitAnswer($this->argument('answer'));
 
         if (($result['status'] ?? '') === 'correct') {
-            $this->info('Correct.');
+            $this->components->info('Correct.');
 
             return self::SUCCESS;
         }
 
-        $this->error('Incorrect.');
+        $this->components->error('Incorrect.');
 
         return self::FAILURE;
     }
