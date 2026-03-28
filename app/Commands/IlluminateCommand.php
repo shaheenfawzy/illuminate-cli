@@ -29,7 +29,7 @@ class IlluminateCommand extends Command
 
         $token = $config->getToken();
         if (! $token) {
-            $this->components->error('No token configured. Run: illuminate --token=<your-token>');
+            $this->components->alert('No token configured. Run: illuminate --token=<your-token>');
 
             return self::FAILURE;
         }
@@ -78,38 +78,7 @@ class IlluminateCommand extends Command
         $this->line(is_string($instructions) ? $instructions : 'No instructions available.');
         $this->newLine();
 
-        // Download SSH key for Stage 2+
-        if (in_array($challenge['stage'] ?? '', ['stage_2', 'stage_3'], true)) {
-            $this->downloadSshKey($client);
-        }
-
         return self::SUCCESS;
-    }
-
-    private function downloadSshKey(ApiClient $client): void
-    {
-        $configStore = app(ConfigStore::class);
-        $keyPath = $configStore->configDir().'/key';
-
-        if (file_exists($keyPath)) {
-            return;
-        }
-
-        try {
-            $this->components->task('Downloading SSH key', function () use ($client, $keyPath): bool {
-                $sshData = $client->getSshKey();
-                $privateKey = $sshData['private_key'] ?? '';
-                if ($privateKey === '') {
-                    return false;
-                }
-                file_put_contents($keyPath, $privateKey);
-                chmod($keyPath, 0600);
-
-                return true;
-            });
-        } catch (Exception) {
-            // Silently fail — they can retry
-        }
     }
 
     private function submitFlag(string $token, string $flag): int

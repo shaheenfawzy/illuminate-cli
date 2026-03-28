@@ -37,16 +37,4 @@ class ApiClient
         /** @var array<string, mixed> */
         return $response->json();
     }
-
-    /** @return array<string, mixed> */
-    public function getSshKey(): array
-    {
-        $response = Http::withToken($this->token)
-            ->get("{$this->baseUrl}/challenge/ssh-key");
-
-        $response->throw();
-
-        /** @var array<string, mixed> */
-        return $response->json();
-    }
 }
