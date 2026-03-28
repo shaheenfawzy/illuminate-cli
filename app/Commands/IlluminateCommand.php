@@ -13,8 +13,7 @@ use LaravelZero\Framework\Commands\Command;
 class IlluminateCommand extends Command
 {
     protected $signature = 'illuminate
-        {--token= : Your authentication token}
-        {--flag= : Submit a discovered flag}';
+        {--token= : Your authentication token}';
 
     protected $description = 'Illuminate — Bi-Tech Hiring Challenge';
 
@@ -32,10 +31,6 @@ class IlluminateCommand extends Command
             $this->components->alert('No token configured. Run: illuminate --token=<your-token>');
 
             return self::FAILURE;
-        }
-
-        if ($flag = $this->option('flag')) {
-            return $this->submitFlag($token, $flag);
         }
 
         return $this->showStage($token);
@@ -79,21 +74,5 @@ class IlluminateCommand extends Command
         $this->newLine();
 
         return self::SUCCESS;
-    }
-
-    private function submitFlag(string $token, string $flag): int
-    {
-        $client = new ApiClient($token);
-        $result = $client->submitAnswer($flag);
-
-        if (($result['status'] ?? '') === 'correct') {
-            $this->components->info('Correct.');
-
-            return self::SUCCESS;
-        }
-
-        $this->components->error('Incorrect.');
-
-        return self::FAILURE;
     }
 }

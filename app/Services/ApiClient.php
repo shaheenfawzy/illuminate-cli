@@ -8,9 +8,14 @@ use Illuminate\Support\Facades\Http;
 
 class ApiClient
 {
-    private string $baseUrl = 'https://illuminate.bitech.dev/api';
+    private string $baseUrl;
 
-    public function __construct(private readonly string $token) {}
+    public function __construct(private readonly string $token)
+    {
+        /** @var string $baseUrl */
+        $baseUrl = config('illuminate.api_base_url');
+        $this->baseUrl = $baseUrl;
+    }
 
     /** @return array<string, mixed> */
     public function getChallenge(): array
