@@ -10,6 +10,8 @@ use App\Support\DatabaseConnector;
 use Exception;
 use LaravelZero\Framework\Commands\Command;
 
+use function Termwind\render;
+
 class IlluminateCommand extends Command
 {
     protected $signature = 'illuminate
@@ -21,14 +23,14 @@ class IlluminateCommand extends Command
     {
         if ($token = $this->option('token')) {
             $config->setToken($token);
-            $this->components->info('Token configured. Run `illuminate` to begin.');
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-green text-white uppercase">info</span> <span class="ml-1">Token configured. Run `illuminate` to begin.</span></div>');
 
             return self::SUCCESS;
         }
 
         $token = $config->getToken();
         if (! $token) {
-            $this->components->alert('No token configured. Run: illuminate --token=<your-token>');
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-yellow text-black uppercase">alert</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
 
             return self::FAILURE;
         }
@@ -44,34 +46,27 @@ class IlluminateCommand extends Command
             $challenge = $client->getChallenge();
         } catch (Exception) {
             $connector = new DatabaseConnector;
-            if (! $connector->verify()) {
-                $this->components->error('Something Went Wrong: Database connection failed — ensure your .env is configured correctly.');
+            $_ = $connector->verify();
 
-                return self::FAILURE;
-            }
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">Something Went Wrong: Database connection failed — ensure your .env is configured correctly.</span></div>');
 
-            return self::SUCCESS;
+            return self::FAILURE;
         }
 
-        // If still at registered or stage_0, show the break
-        if (in_array($challenge['stage'] ?? '', ['registered', 'stage_0'], true)) {
-            $connector = new DatabaseConnector;
-            if (! $connector->verify()) {
-                $this->components->error('Something Went Wrong: Database connection failed — ensure your .env is configured correctly.');
+        $content = $challenge['content'] ?? '';
 
-                return self::FAILURE;
-            }
+        if (! is_string($content) || $content === '') {
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No content received from server.</span></div>');
 
-            return self::SUCCESS;
+            return self::FAILURE;
         }
 
-        // Show current stage instructions
-        $stage = is_string($challenge['stage'] ?? null) ? $challenge['stage'] : 'unknown';
-        $this->components->info("Stage: {$stage}");
-        $this->newLine();
-        $instructions = $challenge['instructions'] ?? 'No instructions available.';
-        $this->line(is_string($instructions) ? $instructions : 'No instructions available.');
-        $this->newLine();
+        render($content);
+
+        // For stage_0, the server returns the error content — return failure
+        if (($challenge['stage'] ?? '') === 'stage_0') {
+            return self::FAILURE;
+        }
 
         return self::SUCCESS;
     }

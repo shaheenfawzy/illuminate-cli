@@ -8,6 +8,8 @@ use App\Services\ApiClient;
 use App\Services\ConfigStore;
 use LaravelZero\Framework\Commands\Command;
 
+use function Termwind\render;
+
 class SubmitCommand extends Command
 {
     protected $signature = 'submit {answer : Your answer for the current stage}';
@@ -18,7 +20,7 @@ class SubmitCommand extends Command
     {
         $token = $config->getToken();
         if (! $token) {
-            $this->components->error('No token configured. Run: illuminate --token=<your-token>');
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
 
             return self::FAILURE;
         }
@@ -26,14 +28,12 @@ class SubmitCommand extends Command
         $client = new ApiClient($token);
         $result = $client->submitAnswer($this->argument('answer'));
 
-        if (($result['status'] ?? '') === 'correct') {
-            $this->components->info('Correct.');
+        $content = $result['content'] ?? '';
 
-            return self::SUCCESS;
+        if (is_string($content) && $content !== '') {
+            render($content);
         }
 
-        $this->components->error('Incorrect.');
-
-        return self::FAILURE;
+        return ($result['status'] ?? '') === 'correct' ? self::SUCCESS : self::FAILURE;
     }
 }
