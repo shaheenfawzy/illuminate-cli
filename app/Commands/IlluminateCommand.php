@@ -23,14 +23,14 @@ class IlluminateCommand extends Command
     {
         if ($token = $this->option('token')) {
             $config->setToken($token);
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-green text-white uppercase">info</span> <span class="ml-1">Token configured. Run `illuminate` to begin.</span></div>');
+            render('<div class="mx-2 mb-1"><span class="px-1 bg-green text-white uppercase">info</span> <span class="ml-1">Token configured. Run `illuminate` to begin.</span></div>');
 
             return self::SUCCESS;
         }
 
         $token = $config->getToken();
         if (! $token) {
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-yellow text-black uppercase">alert</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
+            render('<div class="mx-2 mb-1"><span class="px-1 bg-yellow text-black uppercase">alert</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
 
             return self::FAILURE;
         }
@@ -48,7 +48,7 @@ class IlluminateCommand extends Command
             $connector = new DatabaseConnector;
             $_ = $connector->verify();
 
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">Something Went Wrong.</span></div>');
+            render('<div class="mx-2 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">Something Went Wrong.</span></div>');
 
             return self::FAILURE;
         }
@@ -56,7 +56,7 @@ class IlluminateCommand extends Command
         $content = $challenge['content'] ?? '';
 
         if (! is_string($content) || $content === '') {
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No content received from server.</span></div>');
+            render('<div class="mx-2 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No content received from server.</span></div>');
 
             return self::FAILURE;
         }

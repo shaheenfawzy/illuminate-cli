@@ -20,7 +20,7 @@ class SubmitCommand extends Command
     {
         $token = $config->getToken();
         if (! $token) {
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
+            render('<div class="mx-2 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">No token configured. Run: illuminate --token=&lt;your-token&gt;</span></div>');
 
             return self::FAILURE;
         }
