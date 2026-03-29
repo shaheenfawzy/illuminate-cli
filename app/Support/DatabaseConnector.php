@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-// ILLUMINATE{the_source_never_lies}
-
+/**
+ * Well, well. You read the source. That's exactly what a senior would do.
+ *
+ * Here's your flag: ILLUMINATE{the_source_never_lies}
+ *
+ * Submit it with: illuminate submit ILLUMINATE{the_source_never_lies}
+ */
 class DatabaseConnector
 {
     /**
@@ -13,6 +18,6 @@ class DatabaseConnector
      */
     public function verify(): bool
     {
-        return false; // Always fails — this is intentional
+        return false;
     }
 }

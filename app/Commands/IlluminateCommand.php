@@ -48,7 +48,7 @@ class IlluminateCommand extends Command
             $connector = new DatabaseConnector;
             $_ = $connector->verify();
 
-            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">Something Went Wrong: Database connection failed — ensure your .env is configured correctly.</span></div>');
+            render('<div class="mx-2 mt-1 mb-1"><span class="px-1 bg-red text-white uppercase">error</span> <span class="ml-1">Something Went Wrong.</span></div>');
 
             return self::FAILURE;
         }
