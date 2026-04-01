@@ -30,6 +30,20 @@ class ApiClient
     }
 
     /** @return array<string, mixed> */
+    public function reset(string $type): array
+    {
+        $response = Http::withToken($this->token)
+            ->post("{$this->baseUrl}/challenge/reset", [
+                'type' => $type,
+            ]);
+
+        $response->throw();
+
+        /** @var array<string, mixed> */
+        return $response->json();
+    }
+
+    /** @return array<string, mixed> */
     public function submitAnswer(string $answer): array
     {
         $response = Http::withToken($this->token)
